@@ -1,3 +1,6 @@
 [submodule "Packages/dev.ezhtellar.ai"]
 	path = Packages/dev.ezhtellar.ai
 	url = https://github.com/jeromegamo/dev.ezhtellar.ai.git
+[submodule "Packages/dev.ezhtellar.funk"]
+	path = Packages/dev.ezhtellar.funk
+	url = https://github.com/jeromegamo/dev.ezhtellar.funk.git
