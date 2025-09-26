@@ -1,0 +1,3 @@
+[submodule "Packages/dev.ezhtellar.ai"]
+	path = Packages/dev.ezhtellar.ai
+	url = https://github.com/jeromegamo/dev.ezhtellar.ai.git
