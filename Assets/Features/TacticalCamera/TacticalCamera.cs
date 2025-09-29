@@ -1,17 +1,14 @@
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Ezhtellar.AI;
+using State = Ezhtellar.AI.State;
+using StateMachine = Ezhtellar.AI.StateMachine;
 
 namespace Ezhtellar.Genesis
 {
     public class TacticalCamera : MonoBehaviour
     {
-        public enum State
-        {
-            Panning,
-            Idle,
-            Following
-        }
 
         [SerializeField] private CinemachineCamera m_camera;
         [SerializeField] private CinemachineTargetGroup m_unitsGuide;
@@ -23,62 +20,46 @@ namespace Ezhtellar.Genesis
         [SerializeField] private PanningEdgeGuide m_panningEdgeGuide;
 
         private InputAction m_panningAction;
-        private Vector3 m_panningDirection;
 
-        private State m_state;
         private InputActionMap m_tacticalModeActionMap;
+        private StateMachine m_cameraStateMachine;
+        private string m_lastActivePath = "";
 
         private void Awake() => m_tacticalModeActionMap = m_inputActionAsset.FindActionMap("TacticalMode");
-
+        
         private void Start()
         {
             m_panningAction = m_inputActionAsset.FindAction("Pointer");
-            m_state = State.Idle;
             SetDebugVisuals();
+            m_cameraStateMachine.Start();
+            m_lastActivePath = m_cameraStateMachine.PrintActivePath();
+            Debug.Log(m_lastActivePath);
         }
 
         private void Update()
         {
-            StateSwitcher();
-            UpdatePanningDirection();
+            m_cameraStateMachine.Update();
+            var path = m_cameraStateMachine.PrintActivePath();
+            if (m_lastActivePath != path)
+            {
+                Debug.Log(path);
+                m_lastActivePath = path;
+            }
         }
 
-        private void OnEnable() => m_tacticalModeActionMap.Enable();
+        private void OnEnable()
+        {
+            BuildStateMachine();            
+            m_tacticalModeActionMap.Enable();
+        }
 
-        private void OnDisable() => m_tacticalModeActionMap.Disable();
+        private void OnDisable()
+        {
+            m_cameraStateMachine.Stop();
+            m_tacticalModeActionMap.Disable();
+        }
 
         private void OnValidate() => SetDebugVisuals();
-
-        private void UpdatePanningDirection()
-        {
-            // Only process input if the game window has focus
-            if (!Application.isFocused)
-            {
-                // The editor window (or another application) has focus.
-                // Reset any panning state to avoid it starting when focus returns.
-                m_state = State.Idle;
-                return;
-            }
-
-            Vector2 pointerPosition = m_panningAction.ReadValue<Vector2>();
-            m_panningDirection = GetPanningDirection(pointerPosition);
-
-            if (m_panningDirection != Vector3.zero)
-            {
-                m_state = State.Panning;
-            }
-        }
-
-        private void StateSwitcher()
-        {
-            switch (m_state)
-            {
-                case State.Panning:
-                    FollowPanningGuide();
-                    m_panningGuide.transform.position += m_panningDirection * (m_panSpeed * Time.deltaTime);
-                    break;
-            }
-        }
 
         private Vector3 GetPanningDirection(Vector3 pointerPosition)
         {
@@ -123,6 +104,54 @@ namespace Ezhtellar.Genesis
             m_panningGuide.GetComponent<MeshRenderer>()?.gameObject.SetActive(m_showPanningGuideVisuals);
             m_panningEdgeGuide.gameObject.SetActive(m_showPanningGuideVisuals);
             m_panningEdgeGuide.SetThresholdSize(m_edgeThreshold);
+        }
+
+        private void BuildStateMachine()
+        {
+            Vector3 m_panningDirection = Vector3.zero;
+            
+            var camera = new State.Builder()
+                .WithName("TacticalCamera")
+                .WithOnUpdate(() =>
+                {
+                    Vector3 pointerPosition = m_panningAction.ReadValue<Vector2>();                    
+                    m_panningDirection = GetPanningDirection(pointerPosition);                    
+                })
+                .Build();
+
+            m_cameraStateMachine = StateMachine.FromState(camera);
+            
+            var idle = new State.Builder()
+                .WithName("Idle")
+                .WithOnUpdate(() =>
+                {
+                })
+                .Build();
+            
+            
+            var panning = new State.Builder()
+                .WithName("Panning")
+                .WithOnUpdate(() =>
+                {
+                    if (!Application.isFocused) { return; }
+                    FollowPanningGuide();
+                    m_panningGuide.transform.position += m_panningDirection * (m_panSpeed * Time.deltaTime);                    
+                })
+                .Build();
+            
+            // The editor window (or another application) has focus.
+            // Reset any panning state to avoid it starting when focus returns.
+            panning.AddTransition(new Transition(idle, () => m_panningDirection == Vector3.zero));
+            
+            idle.AddTransition(new Transition(panning, () => m_panningDirection != Vector3.zero));
+            
+            var following = new State.Builder()
+                .WithName("Following")
+                .Build();
+            
+            m_cameraStateMachine.AddState(idle, isInitial: true);
+            m_cameraStateMachine.AddState(panning);
+            m_cameraStateMachine.AddState(following);
         }
     }
 }
