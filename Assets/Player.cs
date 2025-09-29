@@ -9,7 +9,7 @@ public class Player : MonoBehaviour
     [SerializeField] Transform m_target;
     private StateMachine m_playerMachine;
     private NavMeshAgent m_agent;
-    private string lastActivePath = "";
+    private string m_lastActivePath = "";
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void OnEnable()
     {
@@ -25,6 +25,8 @@ public class Player : MonoBehaviour
     {
         m_agent = GetComponent<NavMeshAgent>(); 
         m_playerMachine.Start();
+        m_lastActivePath = m_playerMachine.PrintActivePath();
+        Debug.Log(m_lastActivePath);
     }
 
     // Update is called once per frame
@@ -32,9 +34,9 @@ public class Player : MonoBehaviour
     {
        m_playerMachine.Update();
        var path = m_playerMachine.PrintActivePath();
-       if (path != lastActivePath)
+       if (path != m_lastActivePath)
        {
-           lastActivePath = path;
+           m_lastActivePath = path;
            Debug.Log(path);
        }
     }
