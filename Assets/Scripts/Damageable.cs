@@ -6,6 +6,7 @@ namespace Ezhtellar.Genesis
     {
         public Vector3 Position { get; }
         public void TakeDamage(float damage);
+        public float Health { get; }
     }
 
     public class Damageable : MonoBehaviour, IDamageable
@@ -13,6 +14,8 @@ namespace Ezhtellar.Genesis
         [SerializeField] private float health = 100;
 
         public Vector3 Position => transform.position;
+        
+        public float Health => health;
 
         public void TakeDamage(float damage)
         {

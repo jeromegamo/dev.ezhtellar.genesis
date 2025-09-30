@@ -5,6 +5,7 @@ using UnityEngine.AI;
 
 namespace Ezhtellar.Genesis
 {
+    [RequireComponent(typeof(Damageable))]
     [RequireComponent(typeof(NavMeshAgent))]
     public class Enemy : MonoBehaviour
     {
@@ -13,6 +14,7 @@ namespace Ezhtellar.Genesis
         private NavMeshAgent m_agent;
 
         private string m_lastActivePath = "";
+        private IDamageable m_damageable;
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
         void OnEnable()
@@ -28,6 +30,7 @@ namespace Ezhtellar.Genesis
         private void Start()
         {
             m_agent = GetComponent<NavMeshAgent>();
+            m_damageable = GetComponent<IDamageable>();
             m_enemyMachine.Start();
             m_lastActivePath = m_enemyMachine.PrintActivePath();
             Debug.Log(m_lastActivePath);
@@ -52,15 +55,24 @@ namespace Ezhtellar.Genesis
                 .WithOnEnter(() => Debug.Log("Enemy Machine Started"))
                 .WithOnExit(() => Debug.Log("Enemy Machine Stopped"))
                 .Build());
-
-            var aliveMachine = StateMachine.FromState(new State.Builder()
+            var alive = new State.Builder()
                 .WithName("Alive")
-                .Build());
+                .Build();
+            
+            
+            var aliveMachine = StateMachine.FromState(alive);
 
             var dead = new State.Builder()
                 .WithName("Dead")
+                .WithOnEnter(() => Destroy(gameObject))
                 .Build();
 
+            alive.AddTransition(new Transition(dead, () =>
+            {
+                Debug.Log($"alive {m_damageable.Health}");
+                return m_damageable.Health <= 0;
+            }));
+            
             m_enemyMachine.AddState(aliveMachine, isInitial: true);
             m_enemyMachine.AddState(dead);
 

@@ -8,8 +8,9 @@ namespace Ezhtellar.Genesis
 {
     public class SceneInstaller : MonoBehaviour, IInstaller
     {
-        TacticalMoveController m_tacticalMoveController;
         UnitsManager m_unitsManager;
+        TacticalMoveController m_tacticalMoveController;
+        TacticalAttackGO m_tacticalAttack;
         
         public void InstallBindings(ContainerBuilder containerBuilder)
         {
@@ -46,6 +47,9 @@ namespace Ezhtellar.Genesis
             diamondFormationGo.transform.SetParent(transform); 
                 
             m_tacticalMoveController = new TacticalMoveController(m_unitsManager, interactionReader,  diamondFormationGo);
+
+            m_tacticalAttack = TacticalAttackGO.Instantiate(interactionReader, m_unitsManager);
+            m_tacticalAttack.transform.SetParent(transform);
         }
     }
 }

@@ -14,5 +14,7 @@ namespace Ezhtellar.Genesis
         void Select();
         void Deselect();
         void Move(Vector3 direction);
+        
+        void SetTarget(IDamageable target);
     }
 }

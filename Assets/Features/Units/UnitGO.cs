@@ -14,7 +14,12 @@ namespace Ezhtellar.Genesis
 
         StateMachine m_playerMachine;
         Vector3? m_targetMoveLocation;
-        private string m_lastActivePath = "";
+        IDamageable m_targetUnit;
+        float m_attackRange = 2.5f;
+        float m_timeBetweenAttacks = 1f;
+        float m_sinceLastAttack = Mathf.Infinity;
+        float m_attackDamage = 50; 
+        string m_lastActivePath = "";
         public Vector3 Position => transform.position;
         public int FormationSlotNumber => m_formationSlotNumber;
 
@@ -54,7 +59,18 @@ namespace Ezhtellar.Genesis
             }
         }
 
-        public void Move(Vector3 destination) => m_targetMoveLocation = destination;
+        public void Move(Vector3 destination)
+        {
+            m_targetMoveLocation = destination;
+            m_agent.stoppingDistance = 1;
+        }
+
+        public void SetTarget(IDamageable target)
+        {
+            m_targetUnit = target;
+            m_targetMoveLocation = target.Position;
+            m_agent.stoppingDistance = m_attackRange;
+        }
 
         public void BuildPlayerMachine()
         {
@@ -91,16 +107,29 @@ namespace Ezhtellar.Genesis
                 .WithOnExit(() => m_targetMoveLocation = null)
                 .Build();
 
-            idle.AddTransition(new Transition(movingToLocation, () => m_targetMoveLocation.HasValue));
-
             // Note: Stopping distance should not be set to 0 as the distance calculation will never reach 0.
             movingToLocation.AddTransition(new Transition(idle,
                 () => m_targetMoveLocation.HasValue && 
                       Vector3.Distance(m_targetMoveLocation.Value, m_agent.transform.position) <= m_agent.stoppingDistance));
-
+            
             var attacking = new State.Builder()
                 .WithName("Attacking")
+                .WithOnUpdate(() =>
+                {
+                    m_sinceLastAttack += Time.deltaTime;
+                    if (m_sinceLastAttack > m_timeBetweenAttacks)
+                    {
+                        m_targetUnit?.TakeDamage(m_attackDamage);
+                        m_sinceLastAttack = 0;
+                    } 
+                })
                 .Build();
+            
+            idle.AddTransition(new Transition(movingToLocation, () => m_targetMoveLocation.HasValue));
+            idle.AddTransition(new Transition(attacking, () => m_targetUnit != null &&
+               (Vector3.Distance(m_targetUnit.Position, m_agent.transform.position) <= m_agent.stoppingDistance)));
+            
+
 
             aliveMachine.AddState(idle, isInitial: true);
             aliveMachine.AddState(movingToLocation);
