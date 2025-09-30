@@ -55,6 +55,7 @@ namespace Ezhtellar.Genesis
                 .WithOnEnter(() => Debug.Log("Enemy Machine Started"))
                 .WithOnExit(() => Debug.Log("Enemy Machine Stopped"))
                 .Build());
+            
             var alive = new State.Builder()
                 .WithName("Alive")
                 .Build();
