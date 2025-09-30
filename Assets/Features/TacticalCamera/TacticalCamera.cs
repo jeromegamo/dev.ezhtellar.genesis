@@ -23,7 +23,6 @@ namespace Ezhtellar.Genesis
 
         private InputActionMap m_tacticalModeActionMap;
         private StateMachine m_cameraStateMachine;
-        private string m_lastActivePath = "";
 
         private void Awake() => m_tacticalModeActionMap = m_inputActionAsset.FindActionMap("TacticalMode");
         
@@ -32,19 +31,11 @@ namespace Ezhtellar.Genesis
             m_panningAction = m_inputActionAsset.FindAction("Pointer");
             SetDebugVisuals();
             m_cameraStateMachine.Start();
-            m_lastActivePath = m_cameraStateMachine.PrintActivePath();
-            Debug.Log(m_lastActivePath);
         }
 
         private void Update()
         {
             m_cameraStateMachine.Update();
-            var path = m_cameraStateMachine.PrintActivePath();
-            if (m_lastActivePath != path)
-            {
-                Debug.Log(path);
-                m_lastActivePath = path;
-            }
         }
 
         private void OnEnable()
