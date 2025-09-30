@@ -81,7 +81,7 @@ namespace Ezhtellar.Genesis
 
             var movingToLocation = new State.Builder()
                 .WithName("MovingToLocation")
-                .WithOnEnter(() =>
+                .WithOnUpdate(() =>
                 {
                     if (m_targetMoveLocation.HasValue)
                     {
