@@ -11,8 +11,7 @@ namespace Ezhtellar.Genesis
 
         NavMeshAgent m_agent;
         
-        public bool HasReachedDestination => 
-            m_agent.hasPath && m_agent.remainingDistance <= m_agent.stoppingDistance;
+        public bool HasReachedDestination => !m_agent.hasPath && m_agent.remainingDistance == 0;
         public bool HasDestination => m_agent.hasPath;
 
         private void Start()
@@ -24,12 +23,14 @@ namespace Ezhtellar.Genesis
 
         public void MoveTo(Vector3 destination, float stoppingDistance)
         {
+            m_agent.isStopped = false;
             m_agent.stoppingDistance = stoppingDistance;
             m_agent.SetDestination(destination);
         }
 
         public void StopMoving()
         {
+            m_agent.isStopped = true;
             m_agent.ResetPath();
         }
 
