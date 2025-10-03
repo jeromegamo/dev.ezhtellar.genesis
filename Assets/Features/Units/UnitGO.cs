@@ -13,6 +13,7 @@ namespace Ezhtellar.Genesis
         [SerializeField] private GameObject m_selectionDecal;
         [SerializeField] private int m_formationSlotNumber;
 
+        [SerializeField]
         StateMachine m_playerMachine;
         Vector3? m_targetMoveLocation;
         IDamageable m_ownDamageable;
@@ -31,7 +32,10 @@ namespace Ezhtellar.Genesis
         public event Action<IUnit> Selected;
         public event Action<IUnit> Deselected;
 
-        private void Awake() => m_selectionDecal.SetActive(false);
+        private void Awake()
+        {
+            m_selectionDecal.SetActive(false);
+        }
 
         void OnEnable()
         {
@@ -48,16 +52,12 @@ namespace Ezhtellar.Genesis
             m_moveable = GetComponent<IMoveable>();
             m_ownDamageable = GetComponent<IDamageable>();
             m_playerMachine.Start();
-            
-            m_lastActivePath = m_playerMachine.PrintActivePath();
-            Debug.Log(m_lastActivePath);
         }
 
         // Update is called once per frame
         void Update()
         {
             m_playerMachine.Update();
-
         }
 
         public void Move(Vector3 destination)
