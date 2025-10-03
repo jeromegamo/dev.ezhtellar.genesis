@@ -10,11 +10,13 @@ namespace Ezhtellar.Genesis
 
         int FormationSlotNumber { get; }
         Vector3 Position { get; }
+        
+        bool IsDead { get; }
 
         void Select();
         void Deselect();
         void Move(Vector3 direction);
-        
         void SetTarget(IDamageable target);
+        void TakeDamage(float damage);
     }
 }

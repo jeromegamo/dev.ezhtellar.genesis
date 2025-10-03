@@ -8,12 +8,18 @@ namespace Ezhtellar.Genesis
 {
     public class SceneInstaller : MonoBehaviour, IInstaller
     {
-        UnitsManager m_unitsManager;
         TacticalMoveController m_tacticalMoveController;
         TacticalAttackGO m_tacticalAttack;
         
         public void InstallBindings(ContainerBuilder containerBuilder)
         {
+            containerBuilder.AddSingleton((_) =>
+            {
+                var playableUnits = FindObjectsByType<UnitGO>(FindObjectsSortMode.None);
+                Debug.Log($"Found {playableUnits.Length} units");
+                return new UnitsManager(playableUnits);
+            });
+            
             containerBuilder.AddSingleton((_) =>
             {
                 var go = InteractionReaderGO.Instantiate();
@@ -35,20 +41,18 @@ namespace Ezhtellar.Genesis
             var container = gameObject.scene.GetSceneContainer();
             var selectionReader = container.Resolve<ISelectionReader>(); 
             var interactionReader = container.Resolve<IInteractionReader>();
+            var unitsManager = container.Resolve<UnitsManager>();
             
-            var playableUnits = FindObjectsByType<UnitGO>(FindObjectsSortMode.None);
-            Debug.Log($"Found {playableUnits.Length} units");
-            m_unitsManager = new UnitsManager(playableUnits);
             
-            var  go = TacticalUnitSelectionGO.Instantiate(m_unitsManager, selectionReader);
+            var  go = TacticalUnitSelectionGO.Instantiate(unitsManager, selectionReader);
             go.transform.SetParent(transform);
             
             DiamondFormationGO diamondFormationGo = DiamondFormationGO.Instantiate();
             diamondFormationGo.transform.SetParent(transform); 
                 
-            m_tacticalMoveController = new TacticalMoveController(m_unitsManager, interactionReader,  diamondFormationGo);
+            m_tacticalMoveController = new TacticalMoveController(unitsManager, interactionReader,  diamondFormationGo);
 
-            m_tacticalAttack = TacticalAttackGO.Instantiate(interactionReader, m_unitsManager);
+            m_tacticalAttack = TacticalAttackGO.Instantiate(interactionReader, unitsManager);
             m_tacticalAttack.transform.SetParent(transform);
         }
     }

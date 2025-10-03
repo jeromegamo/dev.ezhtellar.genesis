@@ -19,6 +19,7 @@ namespace Ezhtellar.Genesis
 
         public void TakeDamage(float damage)
         {
+            Debug.Log($"taking damage {damage}");
             health = Mathf.Clamp(health - damage, 0f, health);
         }
     }

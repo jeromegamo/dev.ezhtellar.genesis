@@ -6,21 +6,26 @@ using Ezhtellar.AI;
 namespace Ezhtellar.Genesis
 {
     [RequireComponent(typeof(NavMeshAgent))]
+    [RequireComponent(typeof(IDamageable))]
+    [RequireComponent(typeof(IMoveable))]
     public class UnitGO : MonoBehaviour, IUnit
     {
         [SerializeField] private GameObject m_selectionDecal;
-        [SerializeField] private NavMeshAgent m_agent;
         [SerializeField] private int m_formationSlotNumber;
 
         StateMachine m_playerMachine;
         Vector3? m_targetMoveLocation;
+        IDamageable m_ownDamageable;
         IDamageable m_targetUnit;
         float m_attackRange = 2.5f;
         float m_timeBetweenAttacks = 1f;
         float m_sinceLastAttack = Mathf.Infinity;
         float m_attackDamage = 50; 
         string m_lastActivePath = "";
+        private float m_currentStoppingDistance = 0;
+        IMoveable m_moveable;
         public Vector3 Position => transform.position;
+        public bool IsDead => m_ownDamageable.Health <= 0;
         public int FormationSlotNumber => m_formationSlotNumber;
 
         public event Action<IUnit> Selected;
@@ -40,7 +45,8 @@ namespace Ezhtellar.Genesis
 
         private void Start()
         {
-            m_agent = GetComponent<NavMeshAgent>();
+            m_moveable = GetComponent<IMoveable>();
+            m_ownDamageable = GetComponent<IDamageable>();
             m_playerMachine.Start();
             
             m_lastActivePath = m_playerMachine.PrintActivePath();
@@ -51,25 +57,26 @@ namespace Ezhtellar.Genesis
         void Update()
         {
             m_playerMachine.Update();
-            var path = m_playerMachine.PrintActivePath();
-            if (m_lastActivePath != path)
-            {
-                Debug.Log(path);
-                m_lastActivePath = path;
-            }
+
         }
 
         public void Move(Vector3 destination)
         {
             m_targetMoveLocation = destination;
-            m_agent.stoppingDistance = 1;
+            m_currentStoppingDistance = 1;
+            m_moveable.MoveTo(destination, m_currentStoppingDistance);
         }
 
         public void SetTarget(IDamageable target)
         {
             m_targetUnit = target;
             m_targetMoveLocation = target.Position;
-            m_agent.stoppingDistance = m_attackRange;
+            m_currentStoppingDistance = m_attackRange;
+        }
+
+        public void TakeDamage(float damage)
+        {
+            m_ownDamageable.TakeDamage(damage);
         }
 
         public void BuildPlayerMachine()
@@ -99,18 +106,14 @@ namespace Ezhtellar.Genesis
                 .WithName("MovingToLocation")
                 .WithOnUpdate(() =>
                 {
-                    if (m_targetMoveLocation.HasValue)
-                    {
-                        m_agent.SetDestination(m_targetMoveLocation.Value);
-                    }
+                    // if (m_targetMoveLocation.HasValue)
+                    // {
+                    //     m_movement.MoveTo(m_targetMoveLocation.Value, m_currentStoppingDistance);
+                    // }
                 })
-                .WithOnExit(() => m_targetMoveLocation = null)
+                .WithOnExit(() => m_moveable.StopMoving())
                 .Build();
 
-            // Note: Stopping distance should not be set to 0 as the distance calculation will never reach 0.
-            movingToLocation.AddTransition(new Transition(idle,
-                () => m_targetMoveLocation.HasValue && 
-                      Vector3.Distance(m_targetMoveLocation.Value, m_agent.transform.position) <= m_agent.stoppingDistance));
             
             var attacking = new State.Builder()
                 .WithName("Attacking")
@@ -125,9 +128,9 @@ namespace Ezhtellar.Genesis
                 })
                 .Build();
             
-            idle.AddTransition(new Transition(movingToLocation, () => m_targetMoveLocation.HasValue));
-            idle.AddTransition(new Transition(attacking, () => m_targetUnit != null &&
-               (Vector3.Distance(m_targetUnit.Position, m_agent.transform.position) <= m_agent.stoppingDistance)));
+            idle.AddTransition(new Transition(movingToLocation, () => m_moveable.HasDestination));
+            idle.AddTransition(new Transition(attacking, () => m_targetUnit != null && m_moveable.HasReachedDestination));
+            movingToLocation.AddTransition(new Transition(idle, () => m_moveable.HasReachedDestination));
             
 
 
