@@ -21,7 +21,7 @@ namespace Ezhtellar.Genesis
         float m_attackRange = 2.5f;
         float m_timeBetweenAttacks = 1f;
         float m_sinceLastAttack = Mathf.Infinity;
-        float m_attackDamage = 50; 
+        float m_attackDamage = 10; 
         string m_lastActivePath = "";
         private float m_currentStoppingDistance = 0;
         IMoveable m_moveable;
@@ -72,6 +72,7 @@ namespace Ezhtellar.Genesis
             m_targetUnit = target;
             m_targetMoveLocation = target.Position;
             m_currentStoppingDistance = m_attackRange;
+            m_moveable.MoveTo(target.Position, m_currentStoppingDistance);
         }
 
         public void TakeDamage(float damage)
@@ -100,18 +101,19 @@ namespace Ezhtellar.Genesis
 
             var idle = new State.Builder()
                 .WithName("Idle")
+                .WithOnEnter(() => { m_targetUnit = null;})
                 .Build();
 
             var movingToLocation = new State.Builder()
                 .WithName("MovingToLocation")
                 .WithOnUpdate(() =>
                 {
-                    // if (m_targetMoveLocation.HasValue)
-                    // {
-                    //     m_movement.MoveTo(m_targetMoveLocation.Value, m_currentStoppingDistance);
-                    // }
+                    if (m_targetUnit != null)
+                    {
+                        m_moveable.MoveTo(m_targetUnit.Position, m_currentStoppingDistance);
+                    }
                 })
-                .WithOnExit(() => m_moveable.StopMoving())
+                //.WithOnExit(() => m_moveable.StopMoving())
                 .Build();
 
             
@@ -131,9 +133,12 @@ namespace Ezhtellar.Genesis
             idle.AddTransition(new Transition(movingToLocation, () => m_moveable.HasDestination));
             idle.AddTransition(new Transition(attacking, () => m_targetUnit != null && m_moveable.HasReachedDestination));
             movingToLocation.AddTransition(new Transition(idle, () => m_moveable.HasReachedDestination));
-            
-
-
+            movingToLocation.AddTransition(new Transition(attacking, () => 
+                m_targetUnit != null && Vector3.Distance(transform.position, m_targetUnit.Position) <= m_attackRange));
+            attacking.AddTransition(new Transition(movingToLocation, () => 
+                m_targetUnit != null && 
+                Vector3.Distance(transform.position, m_targetUnit.Position) > m_attackRange));
+            attacking.AddTransition(new Transition(idle, () => m_targetUnit != null && m_targetUnit.IsDead));
             aliveMachine.AddState(idle, isInitial: true);
             aliveMachine.AddState(movingToLocation);
             aliveMachine.AddState(attacking);

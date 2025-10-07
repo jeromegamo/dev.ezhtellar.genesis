@@ -23,14 +23,12 @@ namespace Ezhtellar.Genesis
 
         public void MoveTo(Vector3 destination, float stoppingDistance)
         {
-            m_agent.isStopped = false;
             m_agent.stoppingDistance = stoppingDistance;
             m_agent.SetDestination(destination);
         }
 
         public void StopMoving()
         {
-            m_agent.isStopped = true;
             m_agent.ResetPath();
         }
 

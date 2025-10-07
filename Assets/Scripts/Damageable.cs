@@ -1,26 +1,28 @@
+using System;
 using UnityEngine;
 
 namespace Ezhtellar.Genesis
 {
-    public interface IDamageable
-    {
-        public Vector3 Position { get; }
-        public void TakeDamage(float damage);
-        public float Health { get; }
-    }
-
     public class Damageable : MonoBehaviour, IDamageable
     {
         [SerializeField] private float health = 100;
+        [SerializeField] HealthBar m_healthBar;
 
         public Vector3 Position => transform.position;
         
-        public float Health => health;
+        public float Health => m_healthBar.CurrentHealth;
+        
+        public bool IsDead => m_healthBar.CurrentHealth <= 0;
+
+        private void Start()
+        {
+            m_healthBar.SetMaxHealth(health);
+        }
 
         public void TakeDamage(float damage)
         {
             Debug.Log($"taking damage {damage}");
-            health = Mathf.Clamp(health - damage, 0f, health);
+            m_healthBar.DecreaseHealth(damage);
         }
     }
 }

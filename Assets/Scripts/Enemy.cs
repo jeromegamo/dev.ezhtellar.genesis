@@ -17,7 +17,7 @@ namespace Ezhtellar.Genesis
         [Inject] UnitsManager m_unitsManager;
         [SerializeField] float m_detectionRadius = 5f;
         [SerializeField] float m_attackDamage = 5f;
-        private StateMachine m_enemyMachine;
+        [SerializeField] private StateMachine m_enemyMachine;
         IUnit m_targetUnit;
         private IMoveable m_moveable;
         IDamageable m_ownDamageable;
@@ -50,14 +50,6 @@ namespace Ezhtellar.Genesis
         void Update()
         {
             m_enemyMachine.Update();
-            
-            Debug.Log($"reached: {m_moveable.HasReachedDestination}");
-            var path = m_enemyMachine.PrintActivePath();
-            if (m_lastActivePath != path)
-            {
-                Debug.Log(path);
-                m_lastActivePath = path;
-            }
         }
 
         public void BuildPlayerMachine()
