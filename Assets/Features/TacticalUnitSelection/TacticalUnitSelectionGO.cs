@@ -78,9 +78,9 @@ namespace Ezhtellar.Genesis
         {
             Ray ray = Camera.main.ScreenPointToRay(pointerPosition);
             if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, m_unitLayerMask)
-                && hit.collider.TryGetComponent(out UnitGO unit))
+                && hit.collider.TryGetComponent(out UnitController unitView))
             {
-                unit.Select();
+                unitView.Unit.Select();
             }
         }
 
@@ -90,7 +90,7 @@ namespace Ezhtellar.Genesis
 
             Bounds bounds = new(m_selectionBox.anchoredPosition, m_selectionBox.sizeDelta);
 
-            foreach (IUnit unit in m_unitsManager.PlayableUnits)
+            foreach (Unit unit in m_unitsManager.PlayableUnits)
             {
                 Vector2 point = Camera.main.WorldToScreenPoint(unit.Position);
                 if (bounds.Contains(point))

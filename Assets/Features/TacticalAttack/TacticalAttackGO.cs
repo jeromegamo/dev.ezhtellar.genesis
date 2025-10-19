@@ -29,7 +29,7 @@ public class TacticalAttackGO : MonoBehaviour
       m_interactionReader.WillAttack += InteractionReader_WillAttack;
    }
 
-   private void InteractionReader_WillAttack(IDamageable target)
+   private void InteractionReader_WillAttack(Unit target)
    {
       foreach (var unit in m_unitsManager.SelectedUnits)
       {

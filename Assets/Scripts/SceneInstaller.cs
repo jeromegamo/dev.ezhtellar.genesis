@@ -8,17 +8,12 @@ namespace Ezhtellar.Genesis
 {
     public class SceneInstaller : MonoBehaviour, IInstaller
     {
-        TacticalMoveController m_tacticalMoveController;
+        TacticalMoveReader m_tacticalMoveReader;
         TacticalAttackGO m_tacticalAttack;
         
         public void InstallBindings(ContainerBuilder containerBuilder)
         {
-            containerBuilder.AddSingleton((_) =>
-            {
-                var playableUnits = FindObjectsByType<UnitGO>(FindObjectsSortMode.None);
-                Debug.Log($"Found {playableUnits.Length} units");
-                return new UnitsManager(playableUnits);
-            });
+            containerBuilder.AddSingleton((_) => new UnitsManager());
             
             containerBuilder.AddSingleton((_) =>
             {
@@ -50,7 +45,7 @@ namespace Ezhtellar.Genesis
             DiamondFormationGO diamondFormationGo = DiamondFormationGO.Instantiate();
             diamondFormationGo.transform.SetParent(transform); 
                 
-            m_tacticalMoveController = new TacticalMoveController(unitsManager, interactionReader,  diamondFormationGo);
+            m_tacticalMoveReader = new TacticalMoveReader(unitsManager, interactionReader,  diamondFormationGo);
 
             m_tacticalAttack = TacticalAttackGO.Instantiate(interactionReader, unitsManager);
             m_tacticalAttack.transform.SetParent(transform);

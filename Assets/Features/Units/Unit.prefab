@@ -158,9 +158,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7332985310901117316}
+  - component: {fileID: 7354213790068909093}
   - component: {fileID: 8238705465592129944}
-  - component: {fileID: 5402626417724789988}
-  - component: {fileID: 5956620542162019357}
   - component: {fileID: 1725910895111622315}
   - component: {fileID: 4973273002164916387}
   - component: {fileID: -474417223972735968}
@@ -189,6 +188,19 @@ Transform:
   - {fileID: 4399307681487826655}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7354213790068909093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7406304224273213349}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4531afe1ff63459bb1f5b71b33443568, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Common.DetectionRadius
+  radius: 5
 --- !u!114 &8238705465592129944
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,35 +213,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b9e0e5f0d4584efa817dafa0158faf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_selectionDecal: {fileID: 1106028669895401469}
   m_formationSlotNumber: 1
---- !u!114 &5402626417724789988
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7406304224273213349}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6618ee20254e941a1bc8256a2d71e070, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Ezhtellar.Genesis.Damageable
-  health: 100
-  m_healthBar: {fileID: 0}
---- !u!114 &5956620542162019357
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7406304224273213349}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7e60f8e177042f8a5c64a487b559e9c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Ezhtellar.Genesis.Movement
-  m_moveSpeed: 10
+  m_selectionDecal: {fileID: 1106028669895401469}
+  healthPoints: 100
+  maxHealthPoints: 100
+  m_healthBar: {fileID: 343141385519179185}
 --- !u!136 &1725910895111622315
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -354,12 +342,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 6015543702442652340, guid: b75742fe43f6340fbacf9ec488c6c407, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b75742fe43f6340fbacf9ec488c6c407, type: 3}
+--- !u!114 &343141385519179185 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5182335286486840019, guid: b75742fe43f6340fbacf9ec488c6c407, type: 3}
+  m_PrefabInstance: {fileID: 4839204909156800354}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4983dc853ce34deda3b6773e04017ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthBar
 --- !u!4 &4399307681487826655 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 9089728867452893629, guid: b75742fe43f6340fbacf9ec488c6c407, type: 3}

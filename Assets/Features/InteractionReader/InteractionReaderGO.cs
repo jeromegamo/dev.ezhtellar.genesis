@@ -18,7 +18,7 @@ namespace Ezhtellar.Genesis
         Vector2 m_lastPointerPosition;
         InteractionResult m_lastInteractionResult;
 
-        public event Action<IDamageable> WillAttack;
+        public event Action<Unit> WillAttack;
         public event Action<Vector3> WillMove;
         public event Action<Vector3> WillSetFormation;
         public event Action<Vector3> RotatingFormation;
@@ -69,7 +69,7 @@ namespace Ezhtellar.Genesis
                     if (m_lastInteractionResult.TargetUnit == null)
                     {
                         m_lastInteractionResult.TargetUnit = hit
-                            .transform.gameObject.GetComponent<IDamageable>();
+                            .transform.gameObject.GetComponent<UnitController>()?.Unit;
                     }
 
                     if (!m_lastInteractionResult.PositionToMove.HasValue &&
@@ -131,7 +131,7 @@ namespace Ezhtellar.Genesis
             WillSetFormation?.Invoke(formationPosition);
         }
 
-        void OnWillAttack(IDamageable damageable)
+        void OnWillAttack(Unit damageable)
         {
             WillAttack?.Invoke(damageable);
         }
@@ -159,7 +159,7 @@ namespace Ezhtellar.Genesis
         struct InteractionResult
         {
             public Vector3? PositionToMove;
-            public IDamageable TargetUnit;
+            public Unit TargetUnit;
 
             public void Reset()
             {

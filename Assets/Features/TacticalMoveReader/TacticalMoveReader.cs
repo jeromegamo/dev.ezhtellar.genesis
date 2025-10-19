@@ -6,13 +6,13 @@ using UnityEngine.InputSystem;
 
 namespace Ezhtellar.Genesis
 {
-    public class TacticalMoveController
+    public class TacticalMoveReader
     {
         private IFormation m_formation;
         private UnitsManager m_unitManager;
         private IInteractionReader m_interactionReader;
 
-        public TacticalMoveController(UnitsManager unitsManager, IInteractionReader interactionReader,
+        public TacticalMoveReader(UnitsManager unitsManager, IInteractionReader interactionReader,
             IFormation defaultFormation)
         {
             m_unitManager = unitsManager;
@@ -23,7 +23,7 @@ namespace Ezhtellar.Genesis
             m_interactionReader.RotatingFormation += InteractionReader_RotatingFormation;
         }
 
-        ~TacticalMoveController()
+        ~TacticalMoveReader()
         {
             m_interactionReader.WillMove -= InteractionReader_WillMove;
             m_interactionReader.WillSetFormation -= InteractionReader_WillSetFormation;
@@ -52,12 +52,12 @@ namespace Ezhtellar.Genesis
         {
             var slots = m_formation.GetSlotPositions();
 
-            IOrderedEnumerable<IUnit> orderedSelectedUnits = m_unitManager.SelectedUnits
+            IOrderedEnumerable<Unit> orderedSelectedUnits = m_unitManager.SelectedUnits
                 .OrderBy(unit => unit.FormationSlotNumber);
 
             if (UnitsManager.MaxPlayableUnits == m_unitManager.SelectedUnits.Count())
             {
-                foreach (IUnit unit in orderedSelectedUnits)
+                foreach (Unit unit in orderedSelectedUnits)
                 {
                     IFormation.SlotPosition? slotPosition = slots
                         .First(slot => slot.SlotIndex == unit.FormationSlotNumber);
@@ -72,9 +72,9 @@ namespace Ezhtellar.Genesis
             }
             else
             {
-                IEnumerable<(IUnit unit, IFormation.SlotPosition slot)> zipped =
+                IEnumerable<(Unit unit, IFormation.SlotPosition slot)> zipped =
                     orderedSelectedUnits.Zip(slots, (unit, slot) => (unit, slot));
-                foreach ((IUnit unit, IFormation.SlotPosition slot) pair in zipped)
+                foreach ((Unit unit, IFormation.SlotPosition slot) pair in zipped)
                 {
                     pair.unit.Move(pair.slot.Position);
                 }

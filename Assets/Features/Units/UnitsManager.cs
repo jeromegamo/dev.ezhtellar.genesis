@@ -7,37 +7,32 @@ namespace Ezhtellar.Genesis
 {
     public class UnitsManager
     {
-        private List<IUnit> m_playableUnits;
-        private List<IUnit> m_selectedUnits;
+        private List<Unit> m_playableUnits;
+        private List<Unit> m_selectedUnits;
+        private List<Unit> m_enemyUnits;
 
-        public IEnumerable<IUnit> PlayableUnits => m_playableUnits;
-        public IEnumerable<IUnit> SelectedUnits => m_selectedUnits;
+        public IEnumerable<Unit> PlayableUnits => m_playableUnits;
+        public IEnumerable<Unit> SelectedUnits => m_selectedUnits;
+        public List<Unit> EnemyUnits => m_enemyUnits;
 
         public static int MaxPlayableUnits => 4;
 
-        public UnitsManager(IEnumerable<IUnit> playableUnits)
+        public UnitsManager()
         {
-            m_playableUnits = playableUnits.ToList();
-            m_selectedUnits = new List<IUnit>();
-            m_playableUnits.ForEach(unit =>
-            {
-                unit.Selected += AddSelectedUnit;
-                unit.Deselected += RemoveSelectedUnit;
-            });
+            m_playableUnits = new List<Unit>();
+            m_selectedUnits = new List<Unit>();
+            m_enemyUnits = new List<Unit>();
         }
 
-        ~UnitsManager()
-        {
-            m_playableUnits.ForEach(unit =>
-            {
-                unit.Selected -= AddSelectedUnit;
-                unit.Deselected -= RemoveSelectedUnit;
-            });
-        }
+        public void AddSelectedUnit(Unit u) => m_selectedUnits.Add(u);
 
-        private void AddSelectedUnit(IUnit u) => m_selectedUnits.Add(u);
-
-        private void RemoveSelectedUnit(IUnit u) => m_selectedUnits.Remove(u);
+        public void RemoveSelectedUnit(Unit u) => m_selectedUnits.Remove(u);
+        
+        public void AddPlayableUnit(Unit u) => m_playableUnits.Add(u);
+        public void RemovePlayableUnit(Unit u) => m_playableUnits.Remove(u);
+        
+        public void AddEnemyUnit(Unit u) => m_enemyUnits.Add(u);
+        public void RemoveEnemyUnit(Unit u) => m_enemyUnits.Remove(u);
 
         public void DeselectAllUnits()
         {

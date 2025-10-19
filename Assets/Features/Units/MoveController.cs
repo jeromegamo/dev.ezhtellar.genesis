@@ -1,26 +1,29 @@
-using System;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace Ezhtellar.Genesis
 {
-    [RequireComponent(typeof(NavMeshAgent))]
-    public class MoveableGO : MonoBehaviour, IMoveable
+    public class MoveController
     {
-        [SerializeField] float m_moveSpeed = 5;
-
-        NavMeshAgent m_agent;
+        private NavMeshAgent m_agent;
         
-        public bool HasReachedDestination => !m_agent.hasPath && m_agent.remainingDistance == 0;
-        public bool HasDestination => m_agent.hasPath;
-
-        private void Start()
+        public Vector3 Position => m_agent.transform.position;
+        public bool HasReachedDestination
         {
-            m_agent = GetComponent<NavMeshAgent>();
-            m_agent.speed = m_moveSpeed;
+            get
+            {
+                return m_agent.remainingDistance <= m_agent.stoppingDistance && 
+                       m_agent.velocity.sqrMagnitude < 0.01f;
+            }
+        }
+
+        public bool HasDestination => m_agent.hasPath;
+        
+        public MoveController(NavMeshAgent agent)
+        {
+            m_agent = agent;
         }
         
-
         public void MoveTo(Vector3 destination, float stoppingDistance)
         {
             m_agent.stoppingDistance = stoppingDistance;

@@ -729,17 +729,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9089728867452893629, guid: b75742fe43f6340fbacf9ec488c6c407, type: 3}
   m_PrefabInstance: {fileID: 685204665}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &968509121 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6015543702442652340, guid: b75742fe43f6340fbacf9ec488c6c407, type: 3}
-  m_PrefabInstance: {fileID: 685204665}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4983dc853ce34deda3b6773e04017ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HealthBar
 --- !u!1 &1143500646
 GameObject:
   m_ObjectHideFlags: 0
@@ -878,13 +867,11 @@ GameObject:
   m_Component:
   - component: {fileID: 1150977356}
   - component: {fileID: 1150977357}
-  - component: {fileID: 1150977359}
   - component: {fileID: 1150977358}
   - component: {fileID: 1150977361}
   - component: {fileID: 1150977360}
   - component: {fileID: 1150977362}
   - component: {fileID: 1150977363}
-  - component: {fileID: 1150977364}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -944,20 +931,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &1150977359
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1150977355}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6618ee20254e941a1bc8256a2d71e070, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Ezhtellar.Genesis.Damageable
-  health: 100
-  m_healthBar: {fileID: 968509121}
 --- !u!114 &1150977360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1028,19 +1001,6 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &1150977364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1150977355}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f7e60f8e177042f8a5c64a487b559e9c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Ezhtellar.Genesis.Moveable
-  m_moveSpeed: 2
 --- !u!1001 &1195947232
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1435,7 +1395,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7332985310901117316, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.54506
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7332985310901117316, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1477,7 +1437,12 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1143500649}
-    m_RemovedComponents: []
+    - target: {fileID: 8238705465592129944, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
+      propertyPath: m_healthBar
+      value: 
+      objectReference: {fileID: 526018518}
+    m_RemovedComponents:
+    - {fileID: 5956620542162019357, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
