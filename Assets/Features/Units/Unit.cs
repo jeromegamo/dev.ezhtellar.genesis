@@ -19,18 +19,21 @@ namespace Ezhtellar.Genesis
         private float m_health;
         private float m_maxHealthPoints;
         private float m_attackRange = 2.5f;
-        private float m_detectionRange = 20f;
+        private float m_detectionRange = 10f;
         private float m_stoppingDistance = 0;
         private float m_sinceLastAttack = Mathf.Infinity;
         private float m_sinceLastPlayerControlled = Mathf.Infinity;
+        private float m_timeAllowedForAIIdle = 5f;
         private float m_attackDamage = 10;
         private float m_timeBetweenAttacks = 1f;
+        private bool m_isPlayerControlled = false;
 
         public StateMachine Machine { get; private set; }
         public bool IsSelected { get; private set; }
         public Unit.Type UnitType { get; }
         public string UnitName { get; }
         public float DetectionRange => m_detectionRange;
+
         public float HealthPoints
         {
             get => m_health;
@@ -66,9 +69,10 @@ namespace Ezhtellar.Genesis
             m_enemySensor.DidDetectEnemy += EnemySensor_DidDetectEnemy;
             FormationSlotNumber = formationSlotNumber;
             UnitType = unitType;
-            m_enemySensor.SetUnitHost(this); 
+            m_enemySensor.SetUnitHost(this);
             BuildStateMachine();
         }
+
         public void Select()
         {
             IsSelected = true;
@@ -83,14 +87,22 @@ namespace Ezhtellar.Genesis
 
         public void Move(Vector3 destination)
         {
+            m_isPlayerControlled = true;
+            m_target = null;
+            m_enemySensor.StopDetecting();
+            m_sinceLastPlayerControlled = 0;
             m_stoppingDistance = 0;
             m_moveController.MoveTo(destination, m_stoppingDistance);
         }
 
         public void SetTarget(Unit target)
         {
+            m_isPlayerControlled = true;
+            m_enemySensor.StopDetecting();
+            m_sinceLastPlayerControlled = 0;
             m_target = target;
             m_stoppingDistance = m_attackRange;
+            m_moveController.MoveTo(m_target.Position, m_stoppingDistance);
         }
 
         public void TakeDamage(float damage)
@@ -99,11 +111,33 @@ namespace Ezhtellar.Genesis
             HealthDidChange?.Invoke(HealthPoints);
         }
 
+        private void AutoSetTarget(Unit target)
+        {
+            m_isPlayerControlled = false;
+            m_target = target;
+            m_stoppingDistance = m_attackRange;
+            m_moveController.MoveTo(m_target.Position, m_stoppingDistance);
+        }
+
         private void BuildStateMachine()
         {
             Machine = StateMachine.FromState(
                 new State.Builder()
                     .WithName("Root")
+                    .WithOnUpdate(() =>
+                        {
+                            if (!m_isPlayerControlled)
+                            {
+                                m_enemySensor.StartDetecting();
+                            }
+
+                            m_sinceLastPlayerControlled += Time.deltaTime;
+                            if (m_sinceLastPlayerControlled > m_timeAllowedForAIIdle)
+                            {
+                                m_isPlayerControlled = false;
+                            }
+                        }
+                    )
                     .Build()
             );
 
@@ -120,34 +154,13 @@ namespace Ezhtellar.Genesis
             Machine.AddState(aliveMachine, isInitial: true);
             Machine.AddState(dead);
 
-            var playerControlled = StateMachine.FromState(
-                new State.Builder()
-                    .WithName("PlayerControlled")
-                    .Build()
-            );
-
-            var aiControlled = StateMachine.FromState(
-                new State.Builder()
-                    .WithName("AIControlled")
-                    .Build()
-            );
-
-            aliveMachine.AddState(playerControlled, isInitial: true);
-
-            BuildPlayerControlledMachine(playerControlled);
-            BuildAIControlledMachine(aiControlled);
+            BuildAliveMachine(aliveMachine);
         }
 
-        private void BuildAIControlledMachine(StateMachine aiControlledMachine)
-        {
-            // TODO: should be configurable by player
-        }
-
-        private void BuildPlayerControlledMachine(StateMachine playerControlledMachine)
+        private void BuildAliveMachine(StateMachine aliveMachine)
         {
             var idle = new State.Builder()
                 .WithName("Idle")
-                .WithOnEnter(() => { m_target = null; })
                 .Build();
 
             var movingToLocation = new State.Builder()
@@ -177,49 +190,56 @@ namespace Ezhtellar.Genesis
                 )
                 .Build();
 
+
             idle.AddTransition(
-                new Transition(movingToLocation, () => m_target != null || m_moveController.HasDestination)
+                new Transition(
+                    movingToLocation,
+                    () => m_moveController.HasDestination && !m_moveController.HasReachedDestination
+                )
             );
 
             idle.AddTransition(
-                new Transition(attacking, () => m_target != null && m_moveController.HasReachedDestination)
+                new Transition(
+                    attacking,
+                    () => m_target != null &&
+                          Vector3.Distance(Position, m_target.Position) <= m_attackRange
+                )
             );
 
             movingToLocation.AddTransition(
-                new Transition(idle, () => m_moveController.HasDestination && m_moveController.HasReachedDestination)
+                new Transition(
+                    idle,
+                    () =>
+                        m_target != null && Vector3.Distance(Position, m_target.Position) > m_detectionRange
+                )
             );
-            
+
             movingToLocation.AddTransition(
                 new Transition(
                     attacking,
-                    () =>
-                        m_target != null &&
-                        Vector3.Distance(Position, m_target.Position) <= m_attackRange
+                    () => m_target != null &&
+                          Vector3.Distance(Position, m_target.Position) <= m_attackRange
                 )
             );
 
             attacking.AddTransition(
                 new Transition(
-                    movingToLocation,
-                    () =>
-                        m_target != null &&
-                        Vector3.Distance(Position, m_target.Position) > m_attackRange
+                    idle,
+                    () => m_target != null &&
+                          (Vector3.Distance(Position, m_target.Position) > m_attackRange ||
+                          m_target.IsDead)
                 )
             );
 
-            attacking.AddTransition(
-                new Transition(idle, () => m_target != null && m_target.IsDead)
-            );
 
-            playerControlledMachine.AddState(idle, isInitial: true);
-            playerControlledMachine.AddState(movingToLocation);
-            playerControlledMachine.AddState(attacking);
+            aliveMachine.AddState(idle, isInitial: true);
+            aliveMachine.AddState(movingToLocation);
+            aliveMachine.AddState(attacking);
         }
 
         private void EnemySensor_DidDetectEnemy(Unit unit)
         {
-            SetTarget(unit);
+            AutoSetTarget(unit);
         }
-
     }
 }

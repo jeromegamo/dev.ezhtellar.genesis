@@ -7,5 +7,8 @@ namespace Ezhtellar.Genesis
         event Action<Unit> DidDetectEnemy;
 
         void SetUnitHost(Unit unit);
+
+        void StartDetecting();
+        void StopDetecting();
     }
 }

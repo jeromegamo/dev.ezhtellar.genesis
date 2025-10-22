@@ -729,6 +729,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 9089728867452893629, guid: b75742fe43f6340fbacf9ec488c6c407, type: 3}
   m_PrefabInstance: {fileID: 685204665}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &968509121 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5182335286486840019, guid: b75742fe43f6340fbacf9ec488c6c407, type: 3}
+  m_PrefabInstance: {fileID: 685204665}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4983dc853ce34deda3b6773e04017ed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthBar
 --- !u!1 &1143500646
 GameObject:
   m_ObjectHideFlags: 0
@@ -869,8 +880,8 @@ GameObject:
   - component: {fileID: 1150977357}
   - component: {fileID: 1150977358}
   - component: {fileID: 1150977361}
-  - component: {fileID: 1150977360}
   - component: {fileID: 1150977362}
+  - component: {fileID: 1150977360}
   - component: {fileID: 1150977363}
   m_Layer: 0
   m_Name: Enemy
@@ -943,8 +954,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 611461b882dd4a77b906c6746690c870, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Ezhtellar.Genesis.Enemy
-  m_detectionRadius: 20
-  m_attackDamage: 5
+  m_healthBar: {fileID: 968509121}
 --- !u!195 &1150977361
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -979,7 +989,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4531afe1ff63459bb1f5b71b33443568, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Common.DetectionRadiusGizmo
-  radius: 20
 --- !u!135 &1150977363
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1381,6 +1390,10 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4973273002164916387, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
+      propertyPath: m_Speed
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 5402626417724789988, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
       propertyPath: m_healthBar
       value: 
@@ -1391,7 +1404,7 @@ PrefabInstance:
       objectReference: {fileID: 330585545}
     - target: {fileID: 7332985310901117316, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 7.24
+      value: -2.18
       objectReference: {fileID: 0}
     - target: {fileID: 7332985310901117316, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
       propertyPath: m_LocalPosition.y
@@ -1399,7 +1412,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7332985310901117316, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.45
+      value: -11.73
       objectReference: {fileID: 0}
     - target: {fileID: 7332985310901117316, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1443,6 +1456,7 @@ PrefabInstance:
       objectReference: {fileID: 526018518}
     m_RemovedComponents:
     - {fileID: 5956620542162019357, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
+    - {fileID: 5402626417724789988, guid: 30589bb8badd44e2bafbe00af6f41228, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:

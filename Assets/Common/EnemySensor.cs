@@ -11,6 +11,7 @@ namespace Common
         
         private Unit m_unitHost;
         private float m_detectionRange = 0;
+        private bool m_shouldDetect = false;
         
         void OnDrawGizmosSelected()
         {
@@ -19,14 +20,26 @@ namespace Common
         }
 
         public event Action<Unit> DidDetectEnemy;
+        
         public void SetUnitHost(Unit unitHost)
         {
             m_unitHost = unitHost;
             m_detectionRange =  m_unitHost.DetectionRange;
         }
 
+        public void StartDetecting()
+        {
+           m_shouldDetect = true; 
+        }
+
+        public void StopDetecting()
+        {
+           m_shouldDetect = false; 
+        }
+
         private void Update()
         {
+            if (!m_shouldDetect) { return;}
             if (m_unitHost == null) { return; }
             
             switch (m_unitHost.UnitType)

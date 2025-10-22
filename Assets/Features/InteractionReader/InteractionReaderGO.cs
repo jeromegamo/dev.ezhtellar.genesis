@@ -69,7 +69,7 @@ namespace Ezhtellar.Genesis
                     if (m_lastInteractionResult.TargetUnit == null)
                     {
                         m_lastInteractionResult.TargetUnit = hit
-                            .transform.gameObject.GetComponent<UnitController>()?.Unit;
+                            .transform.gameObject.GetComponent<EnemyController>()?.Unit;
                     }
 
                     if (!m_lastInteractionResult.PositionToMove.HasValue &&

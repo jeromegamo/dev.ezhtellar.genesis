@@ -16,7 +16,7 @@ namespace Ezhtellar.Genesis
         [SerializeField] private StateMachine m_enemyMachine;
         [SerializeField] HealthBar m_healthBar;
 
-        Unit m_unit;
+        public Unit Unit { get; private set; }
         private MoveController m_moveController;
 
         private void Start()
@@ -24,22 +24,22 @@ namespace Ezhtellar.Genesis
             var agent = GetComponent<NavMeshAgent>();
             var sensor = GetComponent<EnemySensor>();
             m_moveController = new MoveController(agent);
-            m_unit = new Unit("Enemy", m_moveController, sensor, 0, 100, Unit.Type.Enemy);
-            m_unit.HealthDidChange += Unit_HealthDidChange;
-            m_unitsManager.AddEnemyUnit(m_unit);
-            m_enemyMachine = m_unit.Machine;
+            Unit = new Unit("Enemy", m_moveController, sensor, 0, 100, Unit.Type.Enemy);
+            Unit.HealthDidChange += Unit_HealthDidChange;
+            m_unitsManager.AddEnemyUnit(Unit);
+            m_enemyMachine = Unit.Machine;
             m_enemyMachine.Start();
         }
 
         private void Unit_HealthDidChange(float healthPoints)
         {
-            m_healthBar.UpdateHealthBar(healthPoints, m_unit.MaxHealthPoints);
+            m_healthBar.UpdateHealthBar(healthPoints, Unit.MaxHealthPoints);
         }
         
         private void OnDisable()
         {
-            m_unit.HealthDidChange -= Unit_HealthDidChange;
-            m_unitsManager.RemoveEnemyUnit(m_unit);
+            Unit.HealthDidChange -= Unit_HealthDidChange;
+            m_unitsManager.RemoveEnemyUnit(Unit);
             m_enemyMachine.Stop();
         }
 
